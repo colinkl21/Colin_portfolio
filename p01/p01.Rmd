@@ -1,0 +1,126 @@
+---
+title: "Po 1- Boxplots"
+author: "Colin Li"
+date: "1/17/2023"
+output: github_document
+---
+
+```{r}
+library(haven)
+library(dplyr)
+library(effsize)
+library(rstatix)
+
+#This study used a mixed design.
+#We measured participants positive attitudes to toward Asians and Whites before and after the condition.
+#Participants are Asian Americans. 
+#The condition is whether being rejected by Asian or White peers. 
+#I excluded people who do not identify as Asian Americans.
+#Here, I only examine the within condition attitude change.
+#That is, for those who experienced Asian prejudice condition, do their positive attitudes decrease toward Asians?
+#And, for those who experienced White prejudice condition, do their positive attitudes decrease toward Whites? 
+
+Adata <- read_sav("C:/Users/Colin/Documents/GitHub/Colin_portfolio/p01/data/AQ.sav")
+Adf <- Adata %>% 
+  filter(Asian == "1" & Conditions == "Ingroup")
+
+t.test(Adf$Q95, Adf$Asian_Warmth, paired = TRUE, alternative = "two.sided") 
+
+Wdf <- Adata %>%
+  filter(Asian == "1" & Conditions == "Outgroup")
+
+t.test(Wdf$Q96, Wdf$White_Warmth, paired = TRUE, alternative = "two.sided")
+
+```
+
+
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+Before <-Adf$Q95
+After <-Adf$Asian_Warmth
+Adf2 <- data.frame(Before = Before, After = After)
+         ggpaired(Adf2, cond1 = "Before", cond2 = "After",
+         fill = "condition", line.color = "gray", line.size = 0.3,
+         palette = "jco", xlab = "Condition", ylab = "Asian Warmth", caption = "t(91) = 2.25, 95% CI [0.03 0.43], Cohen's d = 0.24
+") +  ggtitle("Before and After Positive Attitudes toward Asians"
+)  +  scale_y_continuous(limit = c(0, 10)) +
+ stat_compare_means(vjust = 0.5, method = "t.test", paired = TRUE) +
+  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "white")
+
+#conclusion: Asians who experienced ingroup prejudice felt significantly less warm toward Asians, compared to their baseline attitudes; the mean difference is only .22, so it's not very visible in the boxplot
+         
+```
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+Before <-Wdf$Q96
+After <-Wdf$White_Warmth
+Wdf2 <- data.frame(Before = Before, After = After)
+Wdf2 <- Wdf2[complete.cases(Wdf2),]
+         ggpaired(Wdf2, cond1 = "Before", cond2 = "After",
+         fill = "condition", line.color = "gray", line.size = 0.3,
+         palette = "jco", xlab = "Condition", ylab = "White Warmth", caption = "t(88) = -0.44, 95% CI [-0.19, 0.12], Cohen's d = -0.05
+") + ggtitle("Before and After Positive Attitudes toward Whites
+"
+)  +  
+                      scale_y_continuous(limit = c(0, 10)) +
+ stat_compare_means(vjust = 0.5, method = "t.test", paired = TRUE, na.rm = TRUE) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "white")
+  
+#conclusion: Asians who experienced outgroup prejudice felt the same toward Whites, compared to their baseline attitudes
+
+         
+```
+
+
+```{r}
+
+library(tidyverse)
+library(rafalib)
+
+mypar(1,1)
+dat <- list(Before=Adf$Q95, After=Adf$Asian_Warmth)
+dat %>%
+   boxplot(xlab = "Condition",
+           ylab = "Asian Warmth",
+           cex = 0)
+ dat %>%
+   stripchart(
+     vertical = TRUE,
+     method = "jitter",
+     pch = 16,
+     add = TRUE,
+     col = "#02a4d3"
+   ) 
+mtext(text="t(91) = 2.25, p = .027, 95% CI [0.03 0.43], Cohen's d = 0.24", side = 3, adj = 1, col = "black", cex = 0.8, font = 9)
+```
+
+```{r}
+library(tidyverse)
+library(rafalib)
+
+mypar(1,1)
+list(Wdf)
+Wdf2 %>%
+   boxplot(xlab = "Condition",
+           ylab = "White Warmth",
+           cex = 0)
+ Wdf2 %>%
+   stripchart(
+     vertical = TRUE,
+     method = "jitter",
+     pch = 16,
+     add = TRUE,
+     col = "#02a4d3"
+   )
+mtext(text= "t(88) = -0.44, p = .664, 95% CI [-0.19, 0.12], Cohen's d = -0.05", side = 3, adj = 1, col = "black", cex = 0.8, font = 9)
+```
+
