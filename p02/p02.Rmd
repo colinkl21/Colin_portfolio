@@ -2,10 +2,16 @@
 title: "Po 2- Violin and scatter plots"
 author: "Colin Li"
 date: "1/24/2023"
-output: html_document
+output: 
+  html_document: 
+    highlight: monochrome
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+    number_sections: yes
 ---
 
-
+# Load packages and t-test results
 ```{r filter}
 library(haven)
 library(dplyr)
@@ -37,7 +43,10 @@ t.test(Bd$White_Warmth~Bd$Conditions)
 ```
 
 
+# Plots
+## Ingroup vs. outgroup prejudice on Asian Warmth
 
+Asians who are rejected by Asians feel less warm toward Asians, compared to being rejected by Whites
 
 ```{r Ingroup Prejudice on Ingroup}
 ggplot(data = Bd, 
@@ -57,10 +66,12 @@ ggplot(data = Bd,
   ylab("Asian Warmth") +
   labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39")
 
-#conclusion: Asians who are rejected by Asians feel less warm toward Asians, compared to being rejected by Whites
-
 ```
 
+
+## Ingroup vs. outgroup prejudice on White Warmth
+
+Asians who are rejected by Whites feel the same toward Whites, compared to being rejected by Asians
 
 
 ```{r Outgroup Prejudice on Outgroup}
@@ -81,14 +92,15 @@ ggplot(data = Bd,
   ylab("White Warmth") + 
   labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05")
 
-#conclusion: Asians who are rejected by Whites feel the same toward Whites, compared to being rejected by Asians
-
 ```
 
+## Prejudice type * centrality interaction
 
-```{r Condition Centrality Interaction}
+### Prejudice type * centrality interaction on Asian warmth
 
-#Here, I wanted to test whether the effect of the condition differ by centrality
+The impact of prejudice type (ingroup vs. outgroup) on positive attitude toward Asians does not differ by centrality (i.e., how much Asians value their group membership)
+
+```{r Condition Centrality Interaction on Asian Warmth}
 
 
 ggplot(data = Bd, 
@@ -104,8 +116,16 @@ ggplot(data = Bd,
 )+
    scale_y_continuous(limit = c(1, 10)) 
 
-#conclusion: The impact of Asian ingroup prejudice on attitude does not differ by centrality i.e., how much Asians value their group membership
 
+```
+
+
+### Prejudice type * centrality interaction on White warmth
+
+
+The impact of Asian prejudice type (ingroup vs. outgroup) on positive attitude toward Whites does not differ by centrality (i.e., how much Asians value their group membership)
+
+```{r Condition Centrality Interaction on White Warmth}
 ggplot(data = Bd, 
        mapping = aes(x = Centrality, 
                      y = White_Warmth, color=Conditions)) +
@@ -119,13 +139,18 @@ ggplot(data = Bd,
 )+
    scale_y_continuous(limit = c(1, 10)) 
 
-#conclusion: The impact of Asian ingroup prejudice on attitude does not differ by centrality i.e., how much Asians value their group membership
 
 ```
 
 
+
+
+## Backup plots
+
+These are backup plots for the violin plots
+
+
 ```{r}
-#These are backup plots for the violin plots
 
 #library(dplyr)
 #library(magrittr)
@@ -153,12 +178,17 @@ ggstatsplot::ggbetweenstats(
 
 ```
 
+
+## fun plot
+
+I won't use this graph, but I just think it's cool
+
+
 ```{r}
 
 AW=lm(Asian_Warmth~Conditions*Centrality,Bd)
 summary(AW)
 
-#I won't use this graph, but I just think it's cool
 ggPredict(AW,colorAsFactor = TRUE,interactive=TRUE) 
 
 ```
