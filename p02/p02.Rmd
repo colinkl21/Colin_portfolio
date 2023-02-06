@@ -64,7 +64,31 @@ ggplot(data = Bd,
    scale_y_continuous(limit = c(0, 10))+
   stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
   ylab("Asian Warmth") +
-  labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39")
+  labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39") + ggtitle("Ingroup Prejudice Negatively Affects Ingroup Attitude")
+
+```
+
+
+### for people who prefer bar graphs
+
+
+```{r}
+ggplot(Bd, aes(x= Conditions, y = Asian_Warmth)) +
+  geom_bar(aes(fill = Conditions), stat = "summary", fun.y = "mean") + scale_y_continuous(limit = c(0, 10)) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("Asian Warmth") +
+  labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39") + ggtitle("Ingroup Prejudice Negatively Affects Ingroup Attitude")
+
+
 
 ```
 
@@ -90,9 +114,32 @@ ggplot(data = Bd,
    scale_y_continuous(limit = c(0, 10))+
   stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
   ylab("White Warmth") + 
-  labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05")
+  labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05") + ggtitle("Prejudice Type Had No Effect on Outgroup Attitude")
 
 ```
+
+### for people who prefer bar graphs
+
+
+```{r}
+ggplot(Bd, aes(x= Conditions, y = White_Warmth)) +
+  geom_bar(aes(fill = Conditions), stat = "summary", fun.y = "mean") + scale_y_continuous(limit = c(0, 10)) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("White Warmth") +
+  labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05") + ggtitle("Prejudice Type Had No Effect on Outgroup Attitude")
+```
+
+
+
 
 ## Prejudice type * centrality interaction
 
@@ -114,7 +161,7 @@ ggplot(data = Bd,
   panel.background = element_rect(fill = NA),
   panel.grid.major = element_line(colour = "grey"),
 )+
-   scale_y_continuous(limit = c(1, 10)) 
+   scale_y_continuous(limit = c(1, 10)) + ggtitle("The Impact of Prejudice Type Does Not Differ by Centrality")
 
 
 ```
@@ -137,7 +184,7 @@ ggplot(data = Bd,
   panel.background = element_rect(fill = NA),
   panel.grid.major = element_line(colour = "grey"),
 )+
-   scale_y_continuous(limit = c(1, 10)) 
+   scale_y_continuous(limit = c(1, 10)) + ggtitle("The Impact of Prejudice Type Does Not Differ by Centrality")
 
 
 ```
