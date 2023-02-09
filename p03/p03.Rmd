@@ -20,21 +20,16 @@ library(ggplot2)
 library(plotly)
 library(rstatix)
 
-AQ <- read_sav("C:/Users/Colin/Documents/GitHub/Colin_portfolio/p03/data/AQ.sav")
-
-AQf <- AQ %>% 
-  filter(Asian == "1")
 
 ```
 
 # donut noninteractive
 ```{r}
 
-freq_table(AQf, Race)
 
 donut <- data.frame(
-  Race=c("East", "Southeast", "Filipino/Pacific Islander",  "South Asian", "Multiethnic", "Multiracial"),
-  count=c(72, 31, 25, 11, 8, 7)
+  Race=c("East", "Southeast", "Unknown", "Filipino/Pacific Islander",  "South Asian", "Multiethnic", "Multiracial"),
+  count=c(72, 31, 28, 25, 11, 8, 7)
 )
 
 donut$fraction <- donut$count / sum(donut$count)
