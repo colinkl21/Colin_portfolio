@@ -27,8 +27,7 @@ AQf <- AQ %>%
 
 ```
 
-#donut noninteractive
-
+# donut noninteractive
 ```{r}
 
 freq_table(AQf, Race)
@@ -61,14 +60,9 @@ ggplot(donut, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Race)) +
   xlim(c(2, 4)) +
   theme_void() + ggtitle("Asian Ethnicity")
 
-
-
-
-
 ```
-#bar interactive 
 
-
+# bar interactive 
 ```{r}
 
 p <- ggplot(donut, aes(x = Race, y = count, fill=Race)) +
@@ -80,8 +74,7 @@ ggplotly(p)
 ```
 
 
-#pie interactive
-
+# pie interactive
 ```{r}
 
 colors <- c('#0073C2FF',	'#EFC000FF',	'#868686FF',	'#CD534CFF',	
@@ -96,4 +89,3 @@ fig <- fig %>% layout(title = 'Asian Ethnicity')
 
 fig
 ```
-
