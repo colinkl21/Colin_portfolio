@@ -41,7 +41,7 @@ ggplotly(p)
 ```{r}
 
 o <- ggplot(qcv, aes(x = Variables, y = r, color = Correlation)) + geom_line(color="black", size = 0.5) +
-    geom_point(aes(color=Correlation, size = 0.5, alpha = 0.8)) + theme(panel.background = element_rect(fill = "white", colour = "grey50")) + scale_color_futurama() + scale_y_continuous(limits = c(-1, 1)) + ggtitle("The Mismatch Between Predicted and Actual Correlations") + guides(alpha = FALSE, size = FALSE)
+    geom_point(aes(color=Correlation, size = 0.5, alpha = 0.8)) + theme(panel.background = element_rect(fill = "white", colour = "grey50")) + scale_color_futurama() + scale_y_continuous(limits = c(-1, 1)) + ggtitle("The Mismatch Between Predicted and Actual Correlations") + guides(alpha = FALSE, size = FALSE) + xlab("Criterion Variables")
 
 o
 
