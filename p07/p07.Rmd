@@ -1,0 +1,62 @@
+---
+title: "Portfolio 7 Ant Colony Optimization"
+author: "Colin Li"
+date: "3/28/2023"
+output: github_document
+---
+
+Background: My thesis is a scale development project where in study 1 I used IRT and CFA to select best 6 belonging items from a pool of items. These are traditional psychometric approaches to creating short scales. But I heard there are modern machine learning algorithms can do that. Ant Colony Optimization is one of them. So
+I wanted to see if using this method would result in the same 6 items that we selected from using the traditional psychometric methods. 
+
+```{r}
+
+library(ShortForm)
+library(haven)
+
+ant <- read_sav("C:/Users/Colin/Documents/ant.sav")
+
+
+
+
+
+
+```
+
+```{r}
+
+antModel = ' Belong =~ Bi1 + BiBPS + Bi3 + Bi9 + Bi11 + Bi12 + Bi15 + Bi16 + Bi17 + Bi18 + Bi23 + Bi24 + Bi26 + Bi27 + Bi28 + Bi29 + Bi30 +'
+
+list.items <- 
+  list(c(
+  "Bi1",
+"BiBPS",
+"Bi3",
+"Bi9",
+"Bi11",
+"Bi12",
+"Bi15",
+"Bi16",
+"Bi17",
+"Bi18",
+"Bi23",
+"Bi24",
+"Bi26",
+"Bi27",
+"Bi28",
+"Bi29",
+"Bi30"))
+
+abilityShortForm <- antcolony.lavaan(
+  data = ant,
+  ants = 20, evaporation = 0.9, antModel = antModel,
+  list.items = list.items, full = 17, i.per.f = 6,
+  factors = "Belong", steps = 50, fit.indices = c("cfi", "tli", "rmsea", "srmr"),
+  fit.statistics.test = "(cfi > 0.95)&(tli > 0.95)&(rmsea < 0.06)&(srmr<0.08)",  
+                   max.run = 1000)
+
+
+abilityShortForm
+plot(abilityShortForm, type = 'pheromone')
+
+```
+
