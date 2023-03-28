@@ -27,7 +27,7 @@ power.t.test(ncp = -2.6589, df = 179.97, alpha = 0.05, alternative = "not equal"
 
 ```
 
-below is another plot where I ran planned contrast. Again, this is useful because published papers all have to show these statistics, so we can visualize their power whenever we want.  
+the statistics for the plot below come from another study where I ran a planned contrast. Again, this is useful because published papers all have to show these statistics, so we can visualize their power whenever we want.  
 
 ```{r}
 
