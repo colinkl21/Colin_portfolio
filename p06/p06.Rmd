@@ -1,0 +1,38 @@
+---
+title: "Portfolio 6 Power"
+author: "Colin Li"
+date: "3/28/2023"
+output: github_document
+---
+
+```{r}
+library(pwrss)
+library(haven)
+library(tidyverse)
+
+Adata <- read_sav("C:/Users/Colin/Documents/GitHub/Colin_portfolio/p02/data/AQ.sav")
+Bd <- Adata %>% 
+  filter(Asian == "1")
+
+t.test(Bd$Asian_Warmth~Bd$Conditions)
+
+```
+
+I found a cool package that can visualize power as long as you provide the testing statistics and df. The red curve shows the null hypothesis, whereas the blue curve shows the alternative hypothesis. I wish I could change the legend theme, but I tried the code that works for ggplot won't work for this plot. 
+
+```{r}
+
+power.t.test(ncp = -2.6589, df = 179.97, alpha = 0.05, alternative = "not equal") 
+
+
+```
+
+below is another plot where I ran planned contrast. Again, this is useful because published papers all have to show these statistics, so we can visualize their power whenever we want.  
+
+```{r}
+
+power.f.test(ncp = 6.49, df1 = 1, df2 = 7257, alpha = 0.05, plot = TRUE)
+
+```
+
+
