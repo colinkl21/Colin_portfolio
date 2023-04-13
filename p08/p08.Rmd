@@ -1,0 +1,31 @@
+---
+title: "Portfolio 8 some hisograms"
+author: "Colin Li"
+date: "4/13/2023"
+output: github_document
+---
+
+```{r}
+
+library(psych)
+library(ggplot2)
+library(haven)
+
+```
+
+```{r}
+
+Be <- read_sav("C:/Users/Colin/Documents/PO8.sav")
+
+multi.hist(Be[,sapply(Be, is.numeric)], freq = TRUE, bcol = "#79af97", breaks = 15, main = c("Item 1", "Item 2", "Item 3 (R)", "Item 4"))
+
+
+```
+
+```{r}
+
+
+
+
+```
+
