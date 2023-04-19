@@ -5,6 +5,8 @@ date: "4/13/2023"
 output: github_document
 ---
 
+Background: I'm told that it is helpful to look at each item's histogram when creating a scale. 
+
 ```{r}
 
 library(psych)
@@ -24,8 +26,15 @@ multi.hist(Be[,sapply(Be, is.numeric)], freq = TRUE, bcol = "#79af97", breaks = 
 
 ```{r}
 
+ggplot(Be, aes(x = Be1)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 1", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
 
+ggplot(Be, aes(x = Be2)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 2", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
+
+ggplot(Be, aes(x = BeR)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 3 (R)", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
+
+ggplot(Be, aes(x = Be3)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 4", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
 
 
 ```
 
+I wish I could use facet wrap to combine these 4 into one graph. 
