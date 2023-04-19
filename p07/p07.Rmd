@@ -15,11 +15,6 @@ library(haven)
 
 ant <- read_sav("C:/Users/Colin/Documents/ant.sav")
 
-
-
-
-
-
 ```
 
 ```{r}
@@ -48,7 +43,7 @@ list.items <-
 
 abilityShortForm <- antcolony.lavaan(
   data = ant,
-  ants = 20, evaporation = 0.9, antModel = antModel,
+  ants = 20, evaporation = 0.8, antModel = antModel,
   list.items = list.items, full = 17, i.per.f = 6,
   factors = "Belong", steps = 50, fit.indices = c("cfi", "tli", "rmsea", "srmr"),
   fit.statistics.test = "(cfi > 0.95)&(tli > 0.95)&(rmsea < 0.06)&(srmr<0.08)",  
@@ -59,4 +54,4 @@ abilityShortForm
 plot(abilityShortForm, type = 'pheromone')
 
 ```
-
+Conclusion: I still don't quite understand how to set up all the parameters. And not sure whether this method is superior than traditional psychometric approaches. But 5 out of the resulting 6 items are the same as what we got by using CFA & IRT. 
