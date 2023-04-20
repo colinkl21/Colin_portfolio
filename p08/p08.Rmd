@@ -1,5 +1,5 @@
 ---
-title: "Portfolio 8 some hisograms"
+title: "Portfolio 8 some hisograms and density plots"
 author: "Colin Li"
 date: "4/13/2023"
 output: github_document
