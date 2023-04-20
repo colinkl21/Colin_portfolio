@@ -1,0 +1,81 @@
+---
+title: "Portfolio 9 Dot-and-Whisker Plot"
+author: "Colin Li"
+date: "4/20/2023"
+output: github_document
+---
+
+
+People use multiple regression all the time. I always had a hard time plotting regression results and did not know another way to report it besides using tables. Then I discovered the Dot-and-Whisker Plot. The plot below shows 
+
+```{r}
+
+library(psych)
+library(ggplot2)
+library(haven)
+library(data.table)
+library(ggridges)
+library(ggsci)
+library(dotwhisker)
+library(dplyr)
+library(magrittr)
+library(lm.beta)
+library(tibble)
+
+
+
+```
+
+```{r}
+
+reg <- read_sav("C:/Users/Colin/Documents/reg.sav")
+
+fear <- lm(fe ~ case_p + death_p + cv13 + covrac, data = reg)
+
+summary(fear)
+
+sd<-lm.beta(fear)
+
+distress <- lm(dis ~ case_p + death_p + cv13 + covrac, data = reg)
+
+psyh <- lm(psyh ~ case_p + death_p + cv13 + covrac, data = reg)
+
+
+```
+
+
+
+```{r}
+
+dwplot(fear) + theme_classic()
+
+
+
+```
+
+
+```{r}
+
+dwplot(list(fear, distress, psyh), vline = geom_vline(
+           xintercept = 0,
+           colour = "grey60",
+           linetype = 2
+       ),
+       vars_order = c("case_p", "death_p", "cv13", "covrac")) %>% 
+  relabel_predictors(
+        c(
+            case_p = "County Covid Case %",
+            death_p = "County Death Case %",
+            cv13 = "Covid-Related Life Events",
+           covrac = "Covid-Induced Racism"
+        )) + theme_classic() + scale_color_aaas(name = "Outcome Variables",
+        labels = c("Fear of Covid", "Psychological Distress", "Psychological Health Change")) + labs(title = "Predicting Negative Psychological Outcomes") + theme(plot.title = element_text(face = "bold", hjust = 0.5),  legend.position = c(0.5, 0.1),
+        legend.justification = c(0, 0),
+        legend.background = element_rect(colour = "grey80"),
+        legend.title.align = .5
+    )
+
+```
+
+The dots are the estimates, the lines indicate 95% confidence intervals. It might be easy to use covid-death percentages as an example. We can see death% predicts fear of covid but not the other 2 outcomes because the range includes 0. 
+Obviously there are still problems. I wish the lines and dots could be thicker. I also hope that I can plot the standardized coefficients so the death% doesn't look so dramatic. 
