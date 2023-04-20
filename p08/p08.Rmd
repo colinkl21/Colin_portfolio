@@ -12,6 +12,10 @@ Background: I'm told that it is helpful to look at each item's histogram when cr
 library(psych)
 library(ggplot2)
 library(haven)
+library(data.table)
+library(ggridges)
+library(ggsci)
+
 
 ```
 
@@ -26,7 +30,7 @@ multi.hist(Be[,sapply(Be, is.numeric)], freq = TRUE, bcol = "#79af97", breaks = 
 
 ```{r}
 
-ggplot(Be, aes(x = Be1)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 1", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
+ggplot(Be, aes(x = Be1)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 1") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
 
 ggplot(Be, aes(x = Be2)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 2", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
 
@@ -37,4 +41,37 @@ ggplot(Be, aes(x = Be3)) + geom_histogram(fill = "#79af97", color = "black") + t
 
 ```
 
-I wish I could use facet wrap to combine these 4 into one graph. 
+I would like to draw a normal curve for each histogram but it looks like I have to change it to density plot first. 
+
+```{r}
+
+
+Be_A <- melt(Be, measure.vars = c("Be1","Be2","BeR", "Be3"),
+     variable.name = "Belong", value.name="Score")
+
+Be_A$Belong <- factor(Be_A$Belong, levels = c("Be1", "Be2", "BeR", "Be3"),
+                  labels = c("Item 1", "Item 2", "Item 3 (R)", "Item 4")
+                  )
+ 
+ggplot(Be_A, aes(x = Score)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) + facet_wrap(~ Belong) + theme(strip.background = element_blank(), strip.text = element_text(size = 10, face = "bold"))
+
+```
+
+```{r}
+
+ggplot(Be_A, aes(x = Score, y = Belong, fill = stat(x))) +
+  geom_density_ridges_gradient(bandwidth = 0.4) +
+  scale_fill_gradient(name = "Range") + coord_cartesian(clip = "off") +
+  theme_classic() + scale_x_continuous(limit = c(1, 5)) 
+
+```
+It's cool to have all the density plot together but then I feel like the continuous scale is kinda useless, i.e., the color change means nothing really. I was also having trouble of naming the legend. 
+
+```{r}
+
+ggplot(Be_A, aes(x = Score, y = Belong, fill = stat(x))) + geom_density_ridges_gradient(bandwidth = 0.4) +
+  scale_fill_viridis_c(name = "Range", limits=c(1, 5), breaks=seq(1,5,by=1))  + coord_cartesian(clip = "off") +
+  theme_classic() + scale_x_continuous(limit = c(1, 5)) + labs(title = "Data Distribution of A Short Belonging Scale") + theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+```
+I really like the final look. 
