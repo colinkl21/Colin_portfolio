@@ -71,7 +71,7 @@ It's cool to have all the density plot together but then I feel like the continu
 
 ggplot(Be_A, aes(x = Score, y = Belong, fill = stat(x))) + geom_density_ridges_gradient(bandwidth = 0.4) +
   scale_fill_viridis_c(name = "Range", limits=c(1, 5), breaks=seq(1,5,by=1))  + coord_cartesian(clip = "off") +
-  theme_classic() + scale_x_continuous(limit = c(1, 5)) + labs(title = "Data Distribution of A Short Belonging Scale") + theme(plot.title = element_text(face = "bold", hjust = 0.5))
+  theme_classic() + scale_x_continuous(limit = c(1, 5)) + labs(title = "Data Distribution of A Short College Belonging Scale") + theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 ```
 I really like the final look. 
@@ -79,7 +79,7 @@ I really like the final look.
 ```{r}
 
 ggplot(Be_A, aes(x = Score, y = Belong, fill = Belong)) +   geom_density_ridges(fill = "#79af97", alpha = 0.5, bandwidth = 0.4) +
-  theme_classic() + scale_x_continuous(limit = c(1, 5)) + labs(title = "Data Distribution of A Short Belonging Scale") + theme(plot.title = element_text(face = "bold", hjust = 0.5))
+  theme_classic() + scale_x_continuous(limit = c(1, 5)) + labs(title = "Data Distribution of A Short College Belonging Scale") + theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 
 ```
