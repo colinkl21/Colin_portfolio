@@ -1,5 +1,5 @@
 ---
-title: "Portfolio 9 Dot-and-Whisker Plot"
+title: "Portfolio 10 logistic regression and path model"
 author: "Colin Li"
 date: "5/4/2023"
 output: github_document
@@ -12,9 +12,15 @@ library(lme4)
 library(ggstatsplot)
 library(correlation)
 library(see)
+library(tidyverse)
 library(tidygraph)
 library(ggplot2)
 library(ggsci)
+library(GGally)
+library(sjPlot)
+library(lavaan)
+library(semPlot)
+library(psych)
 
 load(file='C:/Users/Colin/Downloads/ICPSR_37166-V2 (1)/ICPSR_37166/DS0007/37166-0007-Data.rda')
 
@@ -51,17 +57,60 @@ Based on the correlation results, perhaps I should take out community engagement
 
 #logR<-glmer(W3Q29D ~ W2EVERYDAY + W3EVERYDAY + W2SOCSUPPORT + W3SOCSUPPORT + W2CONNECTEDNESS + W3CONNECTEDNESS + W2INTERNALIZED + W3INTERNALIZED + W2FELTSTIGMA + W3FELTSTIGMA + W2IDCENTRAL + W3IDCENTRAL + (1| STUDYID), data = da37166.0007, family = binomial()) #mixed effect model, not sure I would need it summary(logR)
 
-logR_wave1<-glm(W2Q29D ~ W1EVERYDAY  + W1SOCSUPPORT  + W1CONNECTEDNESS  + W1INTERNALIZED  + W1FELTSTIGMA + W1IDCENTRAL, data =da37166.0007, family = binomial)
+glm(W2Q29D ~ W1IDCENTRAL, data =da37166.0007, family = binomial)
+
+
+
+logR_wave1<-glm(W2Q29D ~ W1EVERYDAY  + W1SOCSUPPORT  + W1CONNECTEDNESS  + W1INTERNALIZED  + W1FELTSTIGMA, data =da37166.0007, family = binomial)
 
 summary(logR_wave1)
 
-logR_wave2<-glm(W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA + W2IDCENTRAL, data =da37166.0007, family = binomial)
+logR_wave2<-glm(W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA, data =da37166.0007, family = binomial)
+
+glm(W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA, data =da37166.0007, family = binomial)
 
 summary(logR_wave2)
 
-logR_wave3<-glm(W3Q29D ~ W3EVERYDAY  + W3SOCSUPPORT  + W3CONNECTEDNESS  + W3INTERNALIZED  + W3FELTSTIGMA + W3IDCENTRAL, data =da37166.0007, family = binomial)
+logR_wave3<-glm(W3Q29D ~ W3EVERYDAY  + W3SOCSUPPORT  + W3CONNECTEDNESS  + W3INTERNALIZED  + W3FELTSTIGMA, data =da37166.0007, family = binomial)
 
 summary(logR_wave3)
 
+#Not sure if using wave 3 data to predict wave 3 outcome is legit
+
+plot_model(logR_wave1, show.values = TRUE, value.offset = .3, vline.color = "black", title = "Using Wave 1 Predictors to Predict Coming Out in Wave 2", type ="est", colors="black", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+
+plot_model(logR_wave2, show.values = TRUE, value.offset = .3, vline.color = "black", title = "Using Wave 2 Predictors to Predict Coming Out in Wave 3", type ="est", colors="black", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+
+plot_model(logR_wave3, show.values = TRUE, value.offset = .3, vline.color = "black", title = "Using Wave 3 Predictors to Predict Coming Out in Wave 3", type ="est", colors="black", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+
+
+
+
 ```
+I changed all the x axis to log-odds. But by default it plots odds ratio, which I don't quite understand the benefit of it. Because the outcome was coded as (1)yes, (2)no. Greater scores of everyday discrimination means less encounters with discrimination. So the negative prediction of everyday discrimination means more daily discrimination, less likely to come out or less discrimination, more likely to come out. 
+
+
+```{r}
+
+path <-'W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA
+
+W2INTERNALIZED ~ W2FELTSTIGMA + W2EVERYDAY
+
+W2SOCSUPPORT ~ W2CONNECTEDNESS
+
+'
+
+da37166.0007$W3Q29D<-as.numeric(da37166.0007$W3Q29D=="(1) Yes")
+
+describe(da37166.0007$W3Q29D)
+
+fit<-sem(path, data = da37166.0007)
+
+summary(fit, fit.measures=TRUE, standardized=T)
+
+semPaths(fit, "std", layout = "tree", edge.width = 1.5, vertex.label.cex=0.8, edge.label.cex = 1.5, node.width=2, edge.width=2, residuals=FALSE)
+
+
+```
+
 
