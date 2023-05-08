@@ -113,7 +113,7 @@ fit1<-sem(path1, data = da37166.0007)
 
 summary(fit1, fit.measures=TRUE, standardized=T)
 
-semPaths(fit1, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming Out", "Internalized Homophobia", "Social Support", "Everyday Discrimination", "Community Connectedness", "Felt Stigma"), label.cex =1.2)
+semPaths(fit1, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming\nOut", "Internalized\nHomophobia", "Social\nSupport", "Everyday\nDiscrimination", "Community\nConnectedness", "Felt\nStigma"), label.cex =1.2)
 
 
 ```
@@ -136,7 +136,7 @@ fit2<-sem(path2, data = da37166.0007)
 
 summary(fit2, fit.measures=TRUE, standardized=T)
 
-semPaths(fit2, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming Out", "Internalized Homophobia", "Social Support", "Everyday Discrimination", "Community Connectedness", "Felt Stigma"), label.cex =1.2)
+semPaths(fit2, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming\nOut", "Internalized\nHomophobia", "Social\nSupport", "Everyday\nDiscrimination", "Community\nConnectedness", "Felt\nStigma"), label.cex =1.2)
 
 
 ```
@@ -162,7 +162,7 @@ fit3<-sem(path3, data = da37166.0007)
 
 summary(fit3, fit.measures=TRUE, standardized=T)
 
-semPaths(fit3, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming Out", "Internalized Homophobia", "Social Support", "Everyday Discrimination", "Community Connectedness", "Felt Stigma"), label.cex =1.2)
+semPaths(fit3, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming\nOut", "Internalized\nHomophobia", "Social\nSupport", "Everyday\nDiscrimination", "Community\nConnectedness", "Felt\nStigma"), label.cex =1.2)
 
 
 
