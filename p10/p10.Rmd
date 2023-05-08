@@ -39,13 +39,19 @@ W3<-correlation(da37166.0007[c("W3EVERYDAY", "W3SOCSUPPORT", "W3CONNECTEDNESS", 
 summary(W3)
 
 plot(summary(correlation(data = da37166.0007[c("W1EVERYDAY", "W1SOCSUPPORT", "W1CONNECTEDNESS", "W1INTERNALIZED", "W1FELTSTIGMA", "W1IDCENTRAL")], rename = c("Everyday Disrimination", "Social Support", "Community Connectedness", "Internalized Homophobia", "Felt Stigma", "Identity Centrality")
-))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 1 Predictor Correlations") + scale_fill_gradient2() 
+))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 1 Predictor Correlations") + scale_fill_gradient2(low = "#E64B35FF",
+  mid = "white",
+  high = "#4DBBD5FF") + guides(fill = FALSE)
 
 plot(summary(correlation(data = da37166.0007[c("W2EVERYDAY", "W2SOCSUPPORT", "W2CONNECTEDNESS", "W2INTERNALIZED", "W2FELTSTIGMA", "W2IDCENTRAL")], rename = c("Everyday Disrimination", "Social Support", "Community Connectedness", "Internalized Homophobia", "Felt Stigma", "Identity Centrality")
-))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 2 Predictor Correlations") + scale_fill_gradient2() 
+))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 2 Predictor Correlations") + scale_fill_gradient2(low = "#E64B35FF",
+  mid = "white",
+  high = "#4DBBD5FF") + guides(fill = FALSE)
 
 plot(summary(correlation(data = da37166.0007[c("W3EVERYDAY", "W3SOCSUPPORT", "W3CONNECTEDNESS", "W3INTERNALIZED", "W3FELTSTIGMA", "W3IDCENTRAL")], rename = c("Everyday Disrimination", "Social Support", "Community Connectedness", "Internalized Homophobia", "Felt Stigma", "Identity Centrality")
-))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 3 Predictor Correlations") + scale_fill_gradient2() 
+))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 3 Predictor Correlations") + scale_fill_gradient2(low = "#E64B35FF",
+  mid = "white",
+  high = "#4DBBD5FF") + guides(fill = FALSE)
 
 
 
@@ -77,11 +83,11 @@ summary(logR_wave3)
 
 #Not sure if using wave 3 data to predict wave 3 outcome is legit
 
-plot_model(logR_wave1, show.values = TRUE, value.offset = .3, vline.color = "black", title = "Using Wave 1 Predictors to Predict Coming Out in Wave 2", type ="est", colors="black", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+plot_model(logR_wave1, group.terms = c(1, 2, 2, 1, 2), colors=c("#4DBBD5FF","#E64B35FF"), show.values = TRUE, value.offset = .3, vline.color = "#1B191999", title = "Using Wave 1 Predictors to Predict Coming Out in Wave 2", type ="est", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
 
-plot_model(logR_wave2, show.values = TRUE, value.offset = .3, vline.color = "black", title = "Using Wave 2 Predictors to Predict Coming Out in Wave 3", type ="est", colors="black", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+plot_model(logR_wave2, group.terms = c(1, 2, 2, 1, 2), colors=c("#4DBBD5FF","#E64B35FF"), show.values = TRUE, value.offset = .3, vline.color = "#1B191999", title = "Using Wave 2 Predictors to Predict Coming Out in Wave 3", type ="est", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
 
-plot_model(logR_wave3, show.values = TRUE, value.offset = .3, vline.color = "black", title = "Using Wave 3 Predictors to Predict Coming Out in Wave 3", type ="est", colors="black", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+plot_model(logR_wave3, group.terms = c(1, 2, 2, 1, 2), colors=c("#4DBBD5FF","#E64B35FF"), show.values = TRUE, value.offset = .3, vline.color = "#1B191999", title = "Using Wave 3 Predictors to Predict Coming Out in Wave 3", type ="est", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
 
 
 
@@ -92,7 +98,29 @@ I changed all the x axis to log-odds. But by default it plots odds ratio, which 
 
 ```{r}
 
-path <-'W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA
+path1 <-'W2Q29D ~ W1EVERYDAY  + W1SOCSUPPORT  + W1CONNECTEDNESS  + W1INTERNALIZED  + W1FELTSTIGMA
+
+W1INTERNALIZED ~ W1FELTSTIGMA + W1EVERYDAY
+
+W1SOCSUPPORT ~ W1CONNECTEDNESS
+
+'
+
+da37166.0007$W2Q29D<-as.numeric(da37166.0007$W2Q29D=="(1) Yes")
+
+
+fit1<-sem(path1, data = da37166.0007)
+
+summary(fit1, fit.measures=TRUE, standardized=T)
+
+semPaths(fit1, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming Out", "Internalized Homophobia", "Social Support", "Everyday Discrimination", "Community Connectedness", "Felt Stigma"), label.cex =3.6)
+
+
+```
+
+```{r}
+
+path2 <-'W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA
 
 W2INTERNALIZED ~ W2FELTSTIGMA + W2EVERYDAY
 
@@ -104,13 +132,40 @@ da37166.0007$W3Q29D<-as.numeric(da37166.0007$W3Q29D=="(1) Yes")
 
 describe(da37166.0007$W3Q29D)
 
-fit<-sem(path, data = da37166.0007)
+fit2<-sem(path2, data = da37166.0007)
 
-summary(fit, fit.measures=TRUE, standardized=T)
+summary(fit2, fit.measures=TRUE, standardized=T)
 
-semPaths(fit, "std", layout = "tree", edge.width = 1.5, vertex.label.cex=0.8, edge.label.cex = 1.5, node.width=2, edge.width=2, residuals=FALSE)
+semPaths(fit2, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming Out", "Internalized Homophobia", "Social Support", "Everyday Discrimination", "Community Connectedness", "Felt Stigma"), label.cex =3.6)
 
 
 ```
 
+This is my first time building a path model. Obviously the model fit is pretty bad... And the diagram created by the semplot does not look pretty :(, the numbers overlapped. I guess this just isn't the best package to visualize path analysis results. 
 
+
+
+```{r}
+
+path3 <-'W3Q29D ~ W3EVERYDAY  + W3SOCSUPPORT  + W3CONNECTEDNESS  + W3INTERNALIZED  + W3FELTSTIGMA
+
+W3INTERNALIZED ~ W3FELTSTIGMA + W3EVERYDAY
+
+W3SOCSUPPORT ~ W3CONNECTEDNESS
+
+'
+
+
+describe(da37166.0007$W3Q29D)
+
+fit3<-sem(path3, data = da37166.0007)
+
+summary(fit3, fit.measures=TRUE, standardized=T)
+
+semPaths(fit3, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming Out", "Internalized Homophobia", "Social Support", "Everyday Discrimination", "Community Connectedness", "Felt Stigma"), label.cex =3.6)
+
+
+
+```
+
+I'm happy with the other plots I made, but the package that was used to make these semplots doesn't really allow me to express my creativity. 
