@@ -21,6 +21,9 @@ library(sjPlot)
 library(lavaan)
 library(semPlot)
 library(psych)
+library(sjmisc)
+library(sjlabelled)
+library(car)
 
 load(file='C:/Users/Colin/Downloads/ICPSR_37166-V2 (1)/ICPSR_37166/DS0007/37166-0007-Data.rda')
 
@@ -29,6 +32,7 @@ load(file='C:/Users/Colin/Downloads/ICPSR_37166-V2 (1)/ICPSR_37166/DS0007/37166-
 W1<-correlation(da37166.0007[c("W1EVERYDAY", "W1SOCSUPPORT", "W1CONNECTEDNESS", "W1INTERNALIZED", "W1FELTSTIGMA", "W1IDCENTRAL")], use = "pairwise")
 
 summary(W1)
+
 
 W2<-correlation(da37166.0007[c("W2EVERYDAY", "W2SOCSUPPORT", "W2CONNECTEDNESS", "W2INTERNALIZED", "W2FELTSTIGMA", "W2IDCENTRAL")], use = "pairwise")
 
@@ -65,17 +69,49 @@ Based on the correlation results, perhaps I should take out community engagement
 
 glm(W2Q29D ~ W1IDCENTRAL, data =da37166.0007, family = binomial)
 
+da37166.0007_wave2_out <- da37166.0007 %>% 
+  filter(W2Q29D=="1")
+
+da37166.0007_wave3_out <- da37166.0007 %>% 
+  filter(W3Q29D=="1")
+
+count(da37166.0007_wave2_out$W2SEXMINID)
+
+count(da37166.0007_wave3_out$W3SEXMINID)
 
 
-logR_wave1<-glm(W2Q29D ~ W1EVERYDAY  + W1SOCSUPPORT  + W1CONNECTEDNESS  + W1INTERNALIZED  + W1FELTSTIGMA, data =da37166.0007, family = binomial)
+count(da37166.0007$W1Q123B)
+
+da37166.0007$W1Q123B<-as.numeric(da37166.0007$W1Q123B)
+
+da37166.0007$W2Q106B<-as.numeric(da37166.0007$W2Q106B)
+
+da37166.0007$W1Q124<-as.numeric(da37166.0007$W1Q124)
+
+da37166.0007$W2Q107<-as.numeric(da37166.0007$W2Q107)
+
+da37166.0007$W2Q29D<-as.numeric(da37166.0007$W2Q29D=="(1) Yes")
+
+da37166.0007$W3Q29D<-as.numeric(da37166.0007$W3Q29D=="(1) Yes")
+
+describe(da37166.0007$W2Q29D)
+
+c(da37166.0007$W1Q123B)
+
+logR_wave1<-glm(W2Q29D ~ W1AGE + W1Q123B + W1Q124 + W1EVERYDAY  + W1INTERNALIZED + W1GENDER + W1SEXMINID , data =da37166.0007, family = binomial) # + W1FELTSTIGMA  + W1SOCSUPPORT  + W1CONNECTEDNESS 
 
 summary(logR_wave1)
 
-logR_wave2<-glm(W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA, data =da37166.0007, family = binomial)
+tab_model(logR_wave1, show.est = TRUE)
 
-glm(W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA, data =da37166.0007, family = binomial)
+logR_wave2<-glm(W3Q29D ~ W2AGE + W2Q106B + W2Q107 + W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA, data =da37166.0007, family = binomial)
+
+vif(logR_wave2)
 
 summary(logR_wave2)
+
+tab_model(logR_wave2, show.est = TRUE)
+
 
 logR_wave3<-glm(W3Q29D ~ W3EVERYDAY  + W3SOCSUPPORT  + W3CONNECTEDNESS  + W3INTERNALIZED  + W3FELTSTIGMA, data =da37166.0007, family = binomial)
 
@@ -106,7 +142,8 @@ W1SOCSUPPORT ~ W1CONNECTEDNESS
 
 '
 
-da37166.0007$W2Q29D<-as.numeric(da37166.0007$W2Q29D=="(1) Yes")
+
+describe(da37166.0007$W2Q29D)
 
 
 fit1<-sem(path1, data = da37166.0007)
