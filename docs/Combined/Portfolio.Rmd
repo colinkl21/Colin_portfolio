@@ -1,0 +1,968 @@
+---
+title: "Portfolios"
+author: "Colin Li"
+date: "5/8/2023"
+output: 
+  html_document: 
+    highlight: monochrome
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+---
+
+# Load Packages
+```{r}
+library(haven)
+library(dplyr)
+library(effsize)
+library(rstatix)
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(rafalib)
+library(ggsci)
+library(plotly)
+library(knitr)
+library(kableExtra)
+library(formattable)
+library(data.table)
+library(pwrss)
+library(ShortForm)
+library(psych)
+library(data.table)
+library(ggridges)
+library(dotwhisker)
+library(magrittr)
+library(lm.beta)
+library(tibble)
+library(jtools)
+library(scales)
+library(lme4)
+library(ggstatsplot)
+library(correlation)
+library(see)
+library(tidygraph)
+library(GGally)
+library(sjPlot)
+library(lavaan)
+library(semPlot)
+```
+
+
+# Portfolio 1: Box
+```{r}
+
+
+
+#This study used a mixed design.
+#We measured participants positive attitudes to toward Asians and Whites before and after the condition.
+#Participants are Asian Americans. 
+#The condition is whether being rejected by Asian or White peers. 
+#I excluded people who do not identify as Asian Americans.
+#Here, I only examine the within condition attitude change.
+#That is, for those who experienced Asian prejudice condition, do their positive attitudes decrease toward Asians?
+#And, for those who experienced White prejudice condition, do their positive attitudes decrease toward Whites? 
+
+Adata <- read_sav("C:/Users/Colin/Documents/GitHub/Colin_portfolio/p01/data/AQ.sav")
+Adf <- Adata %>% 
+  filter(Asian == "1" & Conditions == "Ingroup")
+
+t.test(Adf$Q95, Adf$Asian_Warmth, paired = TRUE, alternative = "two.sided") 
+
+Wdf <- Adata %>%
+  filter(Asian == "1" & Conditions == "Outgroup")
+
+t.test(Wdf$Q96, Wdf$White_Warmth, paired = TRUE, alternative = "two.sided")
+
+```
+
+
+## P1 Boxplot 1
+```{r}
+
+Before <-Adf$Q95
+After <-Adf$Asian_Warmth
+Adf2 <- data.frame(Before = Before, After = After)
+         ggpaired(Adf2, cond1 = "Before", cond2 = "After",
+         fill = "condition", line.color = "gray", line.size = 0.3,
+         palette = "jco", xlab = "Condition", ylab = "Asian Warmth", caption = "t(91) = 2.25, 95% CI [0.03 0.43], Cohen's d = 0.24
+") +  ggtitle("Before and After Positive Attitudes toward Asians"
+)  +  scale_y_continuous(limit = c(0, 10)) +
+ stat_compare_means(vjust = 0.5, method = "t.test", paired = TRUE) +
+  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "white")
+
+#conclusion: Asians who experienced ingroup prejudice felt significantly less warm toward Asians, compared to their baseline attitudes; the mean difference is only .22, so it's not very visible in the boxplot
+         
+```
+
+
+## P1 Boxplot 2
+```{r}
+
+Before <-Wdf$Q96
+After <-Wdf$White_Warmth
+Wdf2 <- data.frame(Before = Before, After = After)
+Wdf2 <- Wdf2[complete.cases(Wdf2),]
+         ggpaired(Wdf2, cond1 = "Before", cond2 = "After",
+         fill = "condition", line.color = "gray", line.size = 0.3,
+         palette = "jco", xlab = "Condition", ylab = "White Warmth", caption = "t(88) = -0.44, 95% CI [-0.19, 0.12], Cohen's d = -0.05
+") + ggtitle("Before and After Positive Attitudes toward Whites
+"
+)  +  
+                      scale_y_continuous(limit = c(0, 10)) +
+ stat_compare_means(vjust = 0.5, method = "t.test", paired = TRUE, na.rm = TRUE) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "white")
+  
+#conclusion: Asians who experienced outgroup prejudice felt the same toward Whites, compared to their baseline attitudes
+
+         
+```
+
+## P1 Base R Boxplot 1
+```{r}
+
+mypar(1,1)
+dat <- list(Before=Adf$Q95, After=Adf$Asian_Warmth)
+dat %>%
+   boxplot(xlab = "Condition",
+           ylab = "Asian Warmth",
+           cex = 0)
+ dat %>%
+   stripchart(
+     vertical = TRUE,
+     method = "jitter",
+     pch = 16,
+     add = TRUE,
+     col = "#02a4d3"
+   ) 
+mtext(text="t(91) = 2.25, p = .027, 95% CI [0.03 0.43], Cohen's d = 0.24", side = 3, adj = 1, col = "black", cex = 0.8, font = 9)
+```
+
+
+## P1 Base R Boxplot 1
+```{r}
+library(tidyverse)
+library(rafalib)
+
+mypar(1,1)
+list(Wdf)
+Wdf2 %>%
+   boxplot(xlab = "Condition",
+           ylab = "White Warmth",
+           cex = 0)
+ Wdf2 %>%
+   stripchart(
+     vertical = TRUE,
+     method = "jitter",
+     pch = 16,
+     add = TRUE,
+     col = "#02a4d3"
+   )
+mtext(text= "t(88) = -0.44, p = .664, 95% CI [-0.19, 0.12], Cohen's d = -0.05", side = 3, adj = 1, col = "black", cex = 0.8, font = 9)
+```
+
+# Portfolio 2: Violin and Bar
+```{r filter}
+library(haven)
+library(dplyr)
+require(ggiraph)
+require(ggiraphExtra)
+require(plyr)
+library(ggsci)
+library(ggplot2)
+library(gridExtra)
+library(effsize)
+library(ggpubr)
+Adata <- read_sav("C:/Users/Colin/Documents/GitHub/Colin_portfolio/p02/data/AQ.sav")
+Bd <- Adata %>% 
+  filter(Asian == "1")
+
+t.test(Bd$Asian_Warmth~Bd$Conditions)
+
+t.test(Bd$White_Warmth~Bd$Conditions)
+
+
+#This study used a mixed design.
+#We measured participants positive attitudes to toward Asians and Whites before and after the condition.
+#Participants are Asian Americans. 
+#The condition is whether being rejected by Asian or White peers. 
+#I excluded people who do not identify as Asian Americans.
+#Here, I only examine the between condition attitude difference.
+#That is, compared to being rejected by Whites, do they feel have less positive attitude toward Asians when they are rejected by Asians?
+#That is, compared to being rejected by Asians, do they feel have less positive attitude toward Whites when they are rejected by Whites?
+```
+
+## Ingroup vs. outgroup prejudice on Asian Warmth
+
+Asians who are rejected by Asians feel less warm toward Asians, compared to being rejected by Whites
+
+```{r Ingroup Prejudice on Ingroup}
+ggplot(data = Bd, 
+       mapping = aes(x = Conditions, 
+                     y = Asian_Warmth, fill = Conditions)) +
+  geom_violin() +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("Asian Warmth") +
+  labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39") + ggtitle("Ingroup Prejudice Negatively Affects Ingroup Attitude")
+
+```
+
+
+### for people who prefer bar graphs
+
+```{r}
+ggplot(Bd, aes(x= Conditions, y = Asian_Warmth)) +
+  geom_bar(aes(fill = Conditions), stat = "summary", fun.y = "mean") + scale_y_continuous(limit = c(0, 10)) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("Asian Warmth") +
+  labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39") + ggtitle("Ingroup Prejudice Negatively Affects Ingroup Attitude")
+
+
+
+```
+
+
+## Ingroup vs. outgroup prejudice on White Warmth
+
+Asians who are rejected by Whites feel the same toward Whites, compared to being rejected by Asians
+
+```{r Outgroup Prejudice on Outgroup}
+ggplot(data = Bd, 
+       mapping = aes(x = Conditions, 
+                     y = White_Warmth, fill = Conditions)) +
+  geom_violin() + stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("White Warmth") + 
+  labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05") + ggtitle("Prejudice Type Had No Effect on Outgroup Attitude")
+
+```
+
+### for people who prefer bar graphs
+
+```{r}
+ggplot(Bd, aes(x= Conditions, y = White_Warmth)) +
+  geom_bar(aes(fill = Conditions), stat = "summary", fun.y = "mean") + scale_y_continuous(limit = c(0, 10)) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("White Warmth") +
+  labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05") + ggtitle("Prejudice Type Had No Effect on Outgroup Attitude")
+```
+
+
+## Prejudice type * centrality interaction
+
+### Prejudice type * centrality interaction on Asian warmth
+
+The impact of prejudice type (ingroup vs. outgroup) on positive attitude toward Asians does not differ by centrality (i.e., how much Asians value their group membership)
+
+```{r Condition Centrality Interaction on Asian Warmth}
+
+
+ggplot(data = Bd, 
+       mapping = aes(x = Centrality, 
+                     y = Asian_Warmth, color=Conditions)) +
+  xlab("Centrality") + 
+  ylab("Asian Warmth") + 
+  geom_point() +
+  scale_color_jco()+
+  geom_smooth(method = lm)+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"),
+)+
+   scale_y_continuous(limit = c(1, 10)) + ggtitle("The Impact of Prejudice Type Does Not Differ by Centrality")
+
+
+```
+
+
+
+### Prejudice type * centrality interaction on White warmth
+
+The impact of Asian prejudice type (ingroup vs. outgroup) on positive attitude toward Whites does not differ by centrality (i.e., how much Asians value their group membership)
+
+
+```{r Condition Centrality Interaction on White Warmth}
+ggplot(data = Bd, 
+       mapping = aes(x = Centrality, 
+                     y = White_Warmth, color=Conditions)) +
+  xlab("Centrality") + 
+  ylab("White Warmth") +
+  geom_point() +
+  scale_color_jco()+
+  geom_smooth(method = lm)+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"),
+)+
+   scale_y_continuous(limit = c(1, 10)) + ggtitle("The Impact of Prejudice Type Does Not Differ by Centrality")
+
+
+```
+
+
+
+## Backup plots
+
+These are backup plots for the violin plots
+
+```{r}
+
+#library(dplyr)
+#library(magrittr)
+
+Bd1 <- Bd %>% select(Conditions, Asian_Warmth, White_Warmth)
+
+
+ggstatsplot::ggbetweenstats(
+  data = Bd1, 
+  x = Conditions, 
+  y = Asian_Warmth,
+  messages = FALSE) + scale_y_continuous(limit = c(0, 10))+ xlab("Condition") + 
+  ylab("Asian Warmth") + scale_color_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))
+
+ggstatsplot::ggbetweenstats(
+  data = Bd1, 
+  x = Conditions, 
+  y = White_Warmth,
+  messages = FALSE) + scale_y_continuous(limit = c(0, 10))+ xlab("Condition") + 
+  ylab("White Warmth") + scale_color_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))
+
+```
+
+# Portfolio 3: Pie and Donut
+
+##donut noninteractive
+```{r}
+
+
+donut <- data.frame(
+  Race=c("East", "Southeast", "Unknown", "Filipino/Pacific Islander",  "South Asian", "Multiethnic", "Multiracial"),
+  count=c(72, 31, 28, 25, 11, 8, 7)
+)
+
+donut$fraction <- donut$count / sum(donut$count)
+
+# Compute the cumulative percentages (top of each rectangle)
+donut$ymax <- cumsum(donut$fraction)
+
+# Compute the bottom of each rectangle
+donut$ymin <- c(0, head(donut$ymax, n=-1))
+
+# Compute label position
+donut$labelPosition <- (donut$ymax + donut$ymin) / 2
+
+# Compute a good label
+donut$label <- paste0(donut$category, "\n value: ", donut$count)
+
+
+#donut
+ggplot(donut, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Race)) +
+  geom_rect() +
+  scale_fill_jco()  + 
+  coord_polar(theta="y") +
+  xlim(c(2, 4)) +
+  theme_void() + ggtitle("Asian Ethnicity")
+
+```
+
+## bar interactive 
+```{r}
+
+p <- ggplot(donut, aes(x = Race, y = count, fill=Race)) +
+  geom_col() + scale_fill_jco()  + theme_void() + ggtitle("Asian Ethnicity")
+
+ggplotly(p)
+
+
+```
+
+
+## pie interactive
+```{r}
+
+colors <- c('#0073C2FF',	'#EFC000FF',	'#868686FF',	'#CD534CFF',	
+'#7AA6DCFF', '#003C67FF',	'#8F7700FF',	'#3B3B3BFF', '#A73030FF',	'#4A6990FF')
+
+
+
+fig <- plot_ly(donut, labels = ~Race, values = ~count, type = 'pie', marker = list(colors = colors,
+                      line = list(color = '#FFFFFF', width = 1)))
+
+fig <- fig %>% layout(title = 'Asian Ethnicity')
+
+fig
+```
+
+
+# Portfolio 4: Table and Correlation Plot
+
+## Nice Table
+```{r}
+ta <- read_csv("C:/Users/Colin/Documents/socfit.csv")
+
+customGreen0 = "#DeF7E9"
+
+customGreen = "#71CA97"
+
+formattable(ta, align =c("l","c", "c", "c", "c","c","c","r"), list(
+  `Model` = formatter("span", style = ~ formattable::style(color = "black", font.weight = "bold"), x ~ icontext(ifelse(x != "", "thumbs-up", ""), x)), 
+  `Chi-Square`= color_tile(customGreen0, customGreen), 
+  `P-Value`= color_tile(customGreen, customGreen0)))
+
+
+fi2 <- read_csv("C:/Users/Colin/Documents/semfit.csv")
+
+formattable(fi2, align =c("l","c", "c", "c", "c","c","c","r"), list(
+  `Model` = formatter("span", style = ~ formattable::style(color = "black", font.weight = "bold"), x ~ icontext(ifelse(x != "", "thumbs-up", ""), x)), 
+  `Chi-Square`= color_tile(customGreen0, customGreen), 
+  `P-Value`= color_tile(customGreen, customGreen0)))
+
+
+
+
+```
+
+## Correlation Matrix
+```{r}
+library(ggplot2)
+library(corrplot)
+library(ggstatsplot)
+library(ggsci)
+library(ggcorrplot)
+
+co <- read_sav("C:/Users/Colin/Documents/belong2.sav")
+
+corr <- cor(co, use = "pairwise")
+
+
+#testRes = cor.mtest(co, conf.level = 0.95)
+
+#corrplot(corr, method="color", col=col(200),  type="upper", order="hclust", addCoef.col = "black", tl.col="black", tl.srt=45, sig.level = 0.01, insig = "blank", diag=FALSE)
+
+ggcorrmat(co, cor.vars = c(Belonging, gpa, swl, se, mh, mil_pre, mil_search), 
+  cor.vars.names = c(
+    "College Belonging",
+    "GPA",
+    "Life Satisfaction",
+    "Self-Esteem",
+    "Mental Health",
+    "Meaning in Life (Presence)",
+    "Meaning in Life (Searching)"), p.adjust.method = "none")
+
+
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+
+
+colors <- c('#E64B35FF',	'#4DBBD5FF',	'#00A087FF',	'#3C5488FF',
+'#F39B7FFF',	'#8491B4FF', '#91D1C2FF',	'#DC0000FF',	
+'#7E6148FF',	'#B09C85FF')
+
+
+
+ggcorrplot(corr,
+  type = "upper",
+  insig = "blank",
+  lab = TRUE,
+  digits = 2, colors = c("#E69F00", "white", "#009E73"), ggtheme=ggstatsplot::theme_ggstatsplot())
+
+
+```
+
+ 
+
+# Portfolio 5: QCV
+
+This procedure is called quantifying construct validity. Essentially we asked people to hypothesize the correlations between the definition of belonging with other variables. Then we obtain the actual correlations between our belonging scale and these variables. Then an index can be computed based on the mismatch between hypothesized correlations and actual correlations. This index represent the focal scale's convergent and discriminant validity. P.S. On the graphs, you cannot see the variable names but you can tell what the variables are in the code.
+
+## line
+```{r}
+
+library(tidyverse)
+library(plotly)
+library(ggplot2)
+library(ggsci)
+
+qcv <- read_csv("C:/Users/Colin/Documents/newdata.csv")
+
+qcv$Variables <- recode_factor(qcv$Variables, NTB = "1", GBS = "2", IS = "3", Friend = "4", Grit = "5", Growth = "6", GSE = "7", ACSF = "8", Perf = "9", Lone = "10", HH = "11", Emo = "12", Ext = "13", Agb = "14", Con = "15", Op = "16")
+
+p <- ggplot(qcv, aes(x = Variables, y = r, group = Correlation)) + geom_line(aes(color = Correlation)) + geom_point(aes(color = Correlation)) + theme(panel.background = element_rect(fill = "white", colour = "grey50")) + scale_color_futurama() + scale_y_continuous(limits = c(-1, 1)) +xlab("Criterion Variables") + ggtitle("The Pattern of Correlations Across Criterion Variables")
+
+#qcv$Variables <- recode_factor(qcv$Variables, NTB  = "Need to Belong", GBS = "General Belongingness", ACSF = "Academic Contingency of Self-Worth", Agb = "Agreebleness", Emo = "Emotionality", Ext = "Extraversion", HH = "Honesty-Humility", Con = "Conscientiousness", Op = "Openness", Perf = "Perfectionism", Friend = "Friendship", Growth = "Growth Mindset", Lone = "Loneliness", IS = "Interpersonal Support", Grit = "Grit", GSE = "General Self-Efficacy")
+
+
+p
+
+ggplotly(p)
+
+```
+
+
+## mismatch
+```{r}
+
+o <- ggplot(qcv, aes(x = Variables, y = r, color = Correlation)) + geom_line(color="black", size = 0.5) +
+    geom_point(aes(color=Correlation, size = 0.5, alpha = 0.8)) + theme(panel.background = element_rect(fill = "white", colour = "grey50")) + scale_color_futurama() + scale_y_continuous(limits = c(-1, 1)) + ggtitle("The Mismatch Between Predicted and Actual Correlations") + guides(alpha = FALSE, size = FALSE) + xlab("Criterion Variables")
+
+o
+
+ggplotly(o)
+
+```
+
+# Portfolio 6: Power
+
+I found a cool package that can visualize power as long as you provide the testing statistics and df. The red curve shows the null hypothesis, whereas the blue curve shows the alternative hypothesis. I wish I could change the legend theme, but I tried the code that works for ggplot won't work for this plot. 
+
+```{r}
+
+power.t.test(ncp = -2.6589, df = 179.97, alpha = 0.05, alternative = "not equal") 
+
+
+```
+
+the statistics for the plot below come from another study where I ran a planned contrast. Again, this is useful because published papers all have to show these statistics, so we can visualize their power whenever we want.  
+
+```{r}
+
+power.f.test(ncp = 6.49, df1 = 1, df2 = 7257, alpha = 0.05, plot = TRUE)
+
+```
+
+# Portfolio 7: Ant Colony Optimization
+
+Background: My thesis is a scale development project where in study 1 I used IRT and CFA to select best 6 belonging items from a pool of items. These are traditional psychometric approaches to creating short scales. But I heard there are modern machine learning algorithms can do that. Ant Colony Optimization is one of them. So
+I wanted to see if using this method would result in the same 6 items that we selected from using the traditional psychometric methods. 
+
+```{r}
+ant <- read_sav("C:/Users/Colin/Documents/ant.sav")
+
+antModel = ' Belong =~ Bi1 + BiBPS + Bi3 + Bi9 + Bi11 + Bi12 + Bi15 + Bi16 + Bi17 + Bi18 + Bi23 + Bi24 + Bi26 + Bi27 + Bi28 + Bi29 + Bi30 +'
+
+list.items <- 
+  list(c(
+  "Bi1",
+"BiBPS",
+"Bi3",
+"Bi9",
+"Bi11",
+"Bi12",
+"Bi15",
+"Bi16",
+"Bi17",
+"Bi18",
+"Bi23",
+"Bi24",
+"Bi26",
+"Bi27",
+"Bi28",
+"Bi29",
+"Bi30"))
+
+abilityShortForm <- antcolony.lavaan(
+  data = ant,
+  ants = 20, evaporation = 0.8, antModel = antModel,
+  list.items = list.items, full = 17, i.per.f = 6,
+  factors = "Belong", steps = 50, fit.indices = c("cfi", "tli", "rmsea", "srmr"),
+  fit.statistics.test = "(cfi > 0.95)&(tli > 0.95)&(rmsea < 0.06)&(srmr<0.08)",  
+                   max.run = 1000)
+
+
+abilityShortForm
+plot(abilityShortForm, type = 'pheromone')
+
+```
+
+Conclusion: I still don't quite understand how to set up all the parameters. And not sure whether this method is superior than traditional psychometric approaches. But 5 out of the resulting 6 items are the same as what we got by using CFA & IRT. 
+
+# Portfolio 8: Histogram and Density 
+
+Background: I'm told that it is helpful to look at each item's histogram when creating a scale. 
+
+## All items at a time via psych
+```{r}
+Be <- read_sav("C:/Users/Colin/Documents/PO8.sav")
+
+multi.hist(Be[,sapply(Be, is.numeric)], freq = TRUE, bcol = "#79af97", breaks = 15, main = c("Item 1", "Item 2", "Item 3 (R)", "Item 4"))
+
+
+
+
+```
+
+## All items seperately
+
+```{r}
+
+ggplot(Be, aes(x = Be1)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 1") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
+
+ggplot(Be, aes(x = Be2)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 2", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
+
+ggplot(Be, aes(x = BeR)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 3 (R)", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
+
+ggplot(Be, aes(x = Be3)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + labs(title = "Item 4", xlab = "") + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) 
+
+
+```
+
+
+
+## All items at a time via ggplot
+```{r}
+
+
+Be_A <- melt(Be, measure.vars = c("Be1","Be2","BeR", "Be3"),
+     variable.name = "Belong", value.name="Score")
+
+Be_A$Belong <- factor(Be_A$Belong, levels = c("Be1", "Be2", "BeR", "Be3"),
+                  labels = c("Item 1", "Item 2", "Item 3 (R)", "Item 4")
+                  )
+ 
+ggplot(Be_A, aes(x = Score)) + geom_histogram(fill = "#79af97", color = "black") + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.x = element_blank(), axis.title.y = element_blank()) + facet_wrap(~ Belong) + theme(strip.background = element_blank(), strip.text = element_text(size = 10, face = "bold"))
+
+```
+
+## Density plot
+```{r}
+
+ggplot(Be_A, aes(x = Score, y = Belong, fill = stat(x))) +
+  geom_density_ridges_gradient(bandwidth = 0.4) +
+  scale_fill_gradient(name = "Range") + coord_cartesian(clip = "off") +
+  theme_classic() + scale_x_continuous(limit = c(1, 5)) 
+
+```
+
+It's cool to have all the density plot together but then I feel like the continuous scale is kinda useless, i.e., the color change means nothing really. I was also having trouble of naming the legend.
+
+```{r}
+
+ggplot(Be_A, aes(x = Score, y = Belong, fill = stat(x))) + geom_density_ridges_gradient(bandwidth = 0.4) +
+  scale_fill_viridis_c(name = "Range", limits=c(1, 5), breaks=seq(1,5,by=1))  + coord_cartesian(clip = "off") +
+  theme_classic() + scale_x_continuous(limit = c(1, 5)) + labs(title = "Data Distribution of A Short College Belonging Scale") + theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+```
+
+I really like the final look. 
+
+```{r}
+
+ggplot(Be_A, aes(x = Score, y = Belong, fill = Belong)) +   geom_density_ridges(fill = "#79af97", alpha = 0.5, bandwidth = 0.4) +
+  theme_classic() + scale_x_continuous(limit = c(1, 5)) + labs(title = "Data Distribution of A Short College Belonging Scale") + theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+
+```
+
+# Portfolio 9: Dot and Whisker/Forest Plot
+
+People use multiple regression all the time. I always had a hard time plotting regression results and did not know another way to report it besides using tables. Then I discovered the Dot-and-Whisker Plot. 
+
+## Building Models
+```{r}
+
+reg <- read_sav("C:/Users/Colin/Documents/reg.sav")
+
+fear <- lm(fe ~ case_p + death_p + cv13 + risk_r + covrac, data = reg)
+
+summary(fear)
+
+distress <- lm(dis ~ case_p + death_p + cv13 + risk_r + covrac , data = reg)
+
+psyh <- lm(psyh ~ case_p + death_p + cv13 + risk_r + covrac, data = reg)
+
+
+```
+
+
+## Preliminary Plot
+```{r}
+
+dwplot(list(fear, distress, psyh), vline = geom_vline(
+           xintercept = 0,
+           colour = "grey60",
+           linetype = 2
+       ),
+       vars_order = c("case_p", "death_p", "cv13", "risk_r", "covrac")) %>% 
+  relabel_predictors(
+        c(
+            case_p = "County Covid Case %",
+            death_p = "County Death Case %",
+            cv13 = "Covid-Related Life Events",
+            risk_r = "Race-Related Covid Risk",
+           covrac = "Covid-Induced Racism"
+        )) + theme_classic() + scale_color_aaas(name = "Outcome Variables",
+        labels = c("Fear of Covid", "Psychological Distress", "Psychological Health Change")) + labs(title = "Predicting Negative Psychological Outcomes") + theme(plot.title = element_text(face = "bold", hjust = 0.5),  legend.position = c(0.5, 0.1),
+        legend.justification = c(0, 0),
+        legend.background = element_rect(colour = "grey80"),
+        legend.title.align = .5
+    )
+
+
+```
+
+The dots are the estimates, the lines indicate 95% confidence intervals. It might be easy to use covid-death percentages as an example. We can see death% predicts fear of covid but not the other 2 outcomes because the range includes 0. 
+Obviously there are still problems. I wish the lines and dots could be thicker. I also hope that I can plot the standardized coefficients so the death% doesn't look so dramatic.
+
+## Manually Standardize Variables
+```{r}
+
+reg <- reg[complete.cases(reg[ , c('case_p', 'death_p')]), ]
+
+
+case_p.z <- (reg$case_p - mean(reg$case_p)) / sd(reg$case_p)
+
+death_p.z <- (reg$death_p - mean(reg$death_p)) / sd(reg$death_p)
+
+cv13.z <- (reg$cv13 - mean(reg$cv13)) / sd(reg$cv13)
+
+risk_r.z <- (reg$risk_r - mean(reg$risk_r)) / sd(reg$risk_r)
+
+covrac.z <- (reg$covrac - mean(reg$covrac)) / sd(reg$covrac)
+
+fe.z <- (reg$fe - mean(reg$fe)) / sd(reg$fe)
+
+dis.z <- (reg$dis - mean(reg$dis)) / sd(reg$dis)
+
+psyh.z <- (reg$psyh - mean(reg$psyh)) / sd(reg$psyh)
+
+
+```
+
+
+## Dot and Whisker
+```{r}
+
+fear.z <- lm(fe.z ~ case_p.z + death_p.z + cv13.z + risk_r.z + covrac.z, data = reg)
+
+distress.z <- lm(dis.z ~ case_p.z + death_p.z + cv13.z + risk_r.z + covrac.z , data = reg)
+
+psyh.z <- lm(psyh.z ~ case_p.z + death_p.z + cv13.z + risk_r.z + covrac.z, data = reg)
+
+dwplot(list(fear.z, distress.z, psyh.z), vline = geom_vline(
+           xintercept = 0,
+           colour = "grey60",
+           linetype = 2), whisker_args = list(width = 0.2, size = 1), dot_args = list(size = 3), 
+       vars_order = c("case_p.z", "death_p.z", "cv13.z", "risk_r.z", "covrac.z")) %>% 
+  relabel_predictors(
+        c(
+            case_p.z = "County Covid Case %",
+            death_p.z = "County Death Case %",
+            cv13.z = "Covid-Related Life Events",
+            risk_r.z = "Race-Related Covid Risk",
+           covrac.z = "Covid-Induced Racism"
+        )) + theme_classic() + scale_color_aaas(name = "Outcomes",
+        labels = c("Fear of Covid", "Psychological Distress", "Psychological Health Change")) + labs(title = "Predicting Negative Psychological Health Outcomes") + xlab("Standardized Estimates") + theme(plot.title = element_text(face = "bold", hjust = 0.5),  legend.position = "top", legend.text = element_text(size = 8) ) 
+
+
+```
+
+## Same plot via jtools
+```{r}
+
+
+lancet <- c('#00468bff',	'#ED0000FF',	'#42B540FF',	'#0099B4FF',
+'#925E9FFF',	'#FDAF91FF', '#AD002AFF',	'#ADB6B6FF',	
+'#1B1919FF',	'#B09C85FF')
+
+
+
+plot_summs(fear.z, distress.z, psyh.z, 
+           model.names = c("Fear of Covid", "Psychological Distress", "Psychological Health Change"), coefs = c(
+            "County Covid Case %" = "case_p.z",
+            "County Death Case %" = "death_p.z" ,
+            "Covid-Related Life Events" ="cv13.z" ,
+            "Race-Related Covid Risk" ="risk_r.z" ,
+           "Covid-Induced Racism" ="covrac.z" ), legend.title = "Outcomes", colors = lancet, point.shape=FALSE, point.size = 6) +labs(title = "Predicting Negative Psychological Health Outcomes") +  xlab("Standardized Estimates") + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5), axis.title.y = element_blank(), axis.title.x = element_text(face = "bold"), legend.position = "top", legend.text = element_text(size = 8) )
+
+```
+
+I prefer the dotwhisker package to the jtools only because it provides more customization. For example, here i cannot really change the whisker size or dot shape. But given that both of these plotting functions are based on ggplot2, so if I created the plots in ggplot2, it might provide the optimal customization. 
+
+# Portfolio 10: Logistic and Path
+
+My last portfolio. I thought I wanted to do something epic like rayshader. But I don't have the appropriate data. And I feel like even if I made it, I won't be able to use the code everyday because something like that is not very common and it would end up being less useful. So I decided to do logistic regression and path model for an upcoming project I'm planning to submit to SPSP. 
+
+
+## Testing Predictor Correlations
+```{r}
+load(file='C:/Users/Colin/Downloads/ICPSR_37166-V2 (1)/ICPSR_37166/DS0007/37166-0007-Data.rda')
+
+
+
+W1<-correlation(da37166.0007[c("W1EVERYDAY", "W1SOCSUPPORT", "W1CONNECTEDNESS", "W1INTERNALIZED", "W1FELTSTIGMA", "W1IDCENTRAL")], use = "pairwise")
+
+summary(W1)
+
+W2<-correlation(da37166.0007[c("W2EVERYDAY", "W2SOCSUPPORT", "W2CONNECTEDNESS", "W2INTERNALIZED", "W2FELTSTIGMA", "W2IDCENTRAL")], use = "pairwise")
+
+summary(W2)
+
+W3<-correlation(da37166.0007[c("W3EVERYDAY", "W3SOCSUPPORT", "W3CONNECTEDNESS", "W3INTERNALIZED", "W3FELTSTIGMA", "W3IDCENTRAL")], use = "pairwise")
+
+summary(W3)
+
+plot(summary(correlation(data = da37166.0007[c("W1EVERYDAY", "W1SOCSUPPORT", "W1CONNECTEDNESS", "W1INTERNALIZED", "W1FELTSTIGMA", "W1IDCENTRAL")], rename = c("Everyday Disrimination", "Social Support", "Community Connectedness", "Internalized Homophobia", "Felt Stigma", "Identity Centrality")
+))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 1 Predictor Correlations") + scale_fill_gradient2(low = "#E64B35FF",
+  mid = "white",
+  high = "#4DBBD5FF") + guides(fill = FALSE)
+
+plot(summary(correlation(data = da37166.0007[c("W2EVERYDAY", "W2SOCSUPPORT", "W2CONNECTEDNESS", "W2INTERNALIZED", "W2FELTSTIGMA", "W2IDCENTRAL")], rename = c("Everyday Disrimination", "Social Support", "Community Connectedness", "Internalized Homophobia", "Felt Stigma", "Identity Centrality")
+))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 2 Predictor Correlations") + scale_fill_gradient2(low = "#E64B35FF",
+  mid = "white",
+  high = "#4DBBD5FF") + guides(fill = FALSE)
+
+plot(summary(correlation(data = da37166.0007[c("W3EVERYDAY", "W3SOCSUPPORT", "W3CONNECTEDNESS", "W3INTERNALIZED", "W3FELTSTIGMA", "W3IDCENTRAL")], rename = c("Everyday Disrimination", "Social Support", "Community Connectedness", "Internalized Homophobia", "Felt Stigma", "Identity Centrality")
+))) + theme_classic() + theme(axis.text.x=element_text(vjust = 0.5, angle = 15), plot.title = element_text(face = "bold", hjust = 0.5)) + labs(title = "Wave 3 Predictor Correlations") + scale_fill_gradient2(low = "#E64B35FF",
+  mid = "white",
+  high = "#4DBBD5FF") + guides(fill = FALSE)
+
+
+
+```
+
+Based on the correlation results, perhaps I should take out community engagement or identity centrality in the regression model
+
+## Logistic Regression
+```{r}
+
+#logR<-glmer(W3Q29D ~ W2EVERYDAY + W3EVERYDAY + W2SOCSUPPORT + W3SOCSUPPORT + W2CONNECTEDNESS + W3CONNECTEDNESS + W2INTERNALIZED + W3INTERNALIZED + W2FELTSTIGMA + W3FELTSTIGMA + W2IDCENTRAL + W3IDCENTRAL + (1| STUDYID), data = da37166.0007, family = binomial()) #mixed effect model, not sure I would need it summary(logR)
+
+glm(W2Q29D ~ W1IDCENTRAL, data =da37166.0007, family = binomial)
+
+
+
+logR_wave1<-glm(W2Q29D ~ W1EVERYDAY  + W1SOCSUPPORT  + W1CONNECTEDNESS  + W1INTERNALIZED  + W1FELTSTIGMA, data =da37166.0007, family = binomial)
+
+summary(logR_wave1)
+
+logR_wave2<-glm(W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA, data =da37166.0007, family = binomial)
+
+glm(W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA, data =da37166.0007, family = binomial)
+
+summary(logR_wave2)
+
+logR_wave3<-glm(W3Q29D ~ W3EVERYDAY  + W3SOCSUPPORT  + W3CONNECTEDNESS  + W3INTERNALIZED  + W3FELTSTIGMA, data =da37166.0007, family = binomial)
+
+summary(logR_wave3)
+
+#Not sure if using wave 3 data to predict wave 3 outcome is legit
+
+plot_model(logR_wave1, group.terms = c(1, 2, 2, 2, 2), colors=c("#4DBBD5FF","#E64B35FF"), show.values = TRUE, value.offset = .3, vline.color = "#1B191999", title = "Using Wave 1 Predictors to Predict Coming Out in Wave 2", type ="est", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+
+plot_model(logR_wave2, group.terms = c(1, 2, 2, 2, 2), colors=c("#4DBBD5FF","#E64B35FF"), show.values = TRUE, value.offset = .3, vline.color = "#1B191999", title = "Using Wave 2 Predictors to Predict Coming Out in Wave 3", type ="est", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+
+plot_model(logR_wave3, group.terms = c(1, 2, 2, 1, 2), colors=c("#4DBBD5FF","#E64B35FF"), show.values = TRUE, value.offset = .3, vline.color = "#1B191999", title = "Using Wave 3 Predictors to Predict Coming Out in Wave 3", type ="est", transform = NULL) + theme_classic() + theme(plot.title = element_text(face = "bold", hjust = 0.5)) + scale_x_discrete(labels=c("Felt Stigma", "Internalized Homophobia", "Community Connectedness","Social Support", "Everyday Discrimination"))
+
+
+
+
+```
+
+I changed all the x axis to log-odds. But by default it plots odds ratio, which I don't quite understand the benefit of it. Because the outcome was coded as (1)yes, (2)no. Greater scores of everyday discrimination means less encounters with discrimination. So the negative prediction of everyday discrimination means more daily discrimination, less likely to come out or less discrimination, more likely to come out. 
+
+
+## Path Models
+```{r}
+
+path1 <-'W2Q29D ~ W1EVERYDAY  + W1SOCSUPPORT  + W1CONNECTEDNESS  + W1INTERNALIZED  + W1FELTSTIGMA
+
+W1INTERNALIZED ~ W1FELTSTIGMA + W1EVERYDAY
+
+W1SOCSUPPORT ~ W1CONNECTEDNESS
+
+'
+
+da37166.0007$W2Q29D<-as.numeric(da37166.0007$W2Q29D=="(1) Yes")
+
+
+fit1<-sem(path1, data = da37166.0007)
+
+summary(fit1, fit.measures=TRUE, standardized=T)
+
+semPaths(fit1, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming\nOut", "Internalized\nHomophobia", "Social\nSupport", "Everyday\nDiscrimination", "Community\nConnectedness", "Felt\nStigma"), label.cex =1.2)
+
+path2 <-'W3Q29D ~ W2EVERYDAY  + W2SOCSUPPORT  + W2CONNECTEDNESS  + W2INTERNALIZED  + W2FELTSTIGMA
+
+W2INTERNALIZED ~ W2FELTSTIGMA + W2EVERYDAY
+
+W2SOCSUPPORT ~ W2CONNECTEDNESS
+
+'
+
+da37166.0007$W3Q29D<-as.numeric(da37166.0007$W3Q29D=="(1) Yes")
+
+describe(da37166.0007$W3Q29D)
+
+fit2<-sem(path2, data = da37166.0007)
+
+summary(fit2, fit.measures=TRUE, standardized=T)
+
+semPaths(fit2, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming\nOut", "Internalized\nHomophobia", "Social\nSupport", "Everyday\nDiscrimination", "Community\nConnectedness", "Felt\nStigma"), label.cex =1.2)
+
+path3 <-'W3Q29D ~ W3EVERYDAY  + W3SOCSUPPORT  + W3CONNECTEDNESS  + W3INTERNALIZED  + W3FELTSTIGMA
+
+W3INTERNALIZED ~ W3FELTSTIGMA + W3EVERYDAY
+
+W3SOCSUPPORT ~ W3CONNECTEDNESS
+
+'
+
+
+describe(da37166.0007$W3Q29D)
+
+fit3<-sem(path3, data = da37166.0007)
+
+summary(fit3, fit.measures=TRUE, standardized=T)
+
+semPaths(fit3, "std", layout = "tree", edge.width = 1.5, edge.label.cex = 1.5, node.width=2, residuals=FALSE, nodeLabels = c("Coming\nOut", "Internalized\nHomophobia", "Social\nSupport", "Everyday\nDiscrimination", "Community\nConnectedness", "Felt\nStigma"), label.cex =1.2)
+
+
+
+```
+
+This is my first time building a path model. Obviously the model fit is pretty bad... And the diagram created by the semplot does not look pretty :(, the numbers overlapped. I guess this just isn't the best package to visualize path analysis results.I'm happy with the other plots I made, but the package that was used to make these semplots doesn't really allow me to express my creativity. 

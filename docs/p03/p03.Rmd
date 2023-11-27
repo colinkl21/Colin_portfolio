@@ -1,0 +1,86 @@
+---
+title: "Po 3- Pie"
+author: "Colin Li"
+date: "2/8/2023"
+output: 
+  html_document: 
+    highlight: monochrome
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+---
+
+# Load packages and filtering
+```{r}
+library(ggsci)
+library(haven)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(rstatix)
+
+
+```
+
+# donut noninteractive
+```{r}
+
+
+donut <- data.frame(
+  Race=c("East", "Southeast", "Unknown", "Filipino/Pacific Islander",  "South Asian", "Multiethnic", "Multiracial"),
+  count=c(72, 31, 28, 25, 11, 8, 7)
+)
+
+donut$fraction <- donut$count / sum(donut$count)
+
+# Compute the cumulative percentages (top of each rectangle)
+donut$ymax <- cumsum(donut$fraction)
+
+# Compute the bottom of each rectangle
+donut$ymin <- c(0, head(donut$ymax, n=-1))
+
+# Compute label position
+donut$labelPosition <- (donut$ymax + donut$ymin) / 2
+
+# Compute a good label
+donut$label <- paste0(donut$category, "\n value: ", donut$count)
+
+
+#donut
+ggplot(donut, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Race)) +
+  geom_rect() +
+  scale_fill_jco()  + 
+  coord_polar(theta="y") +
+  xlim(c(2, 4)) +
+  theme_void() + ggtitle("Asian Ethnicity")
+
+```
+
+# bar interactive 
+```{r}
+
+p <- ggplot(donut, aes(x = Race, y = count, fill=Race)) +
+  geom_col() + scale_fill_jco()  + theme_void() + ggtitle("Asian Ethnicity")
+
+ggplotly(p)
+
+
+```
+
+
+# pie interactive
+```{r}
+
+colors <- c('#0073C2FF',	'#EFC000FF',	'#868686FF',	'#CD534CFF',	
+'#7AA6DCFF', '#003C67FF',	'#8F7700FF',	'#3B3B3BFF', '#A73030FF',	'#4A6990FF')
+
+
+
+fig <- plot_ly(donut, labels = ~Race, values = ~count, type = 'pie', marker = list(colors = colors,
+                      line = list(color = '#FFFFFF', width = 1)))
+
+fig <- fig %>% layout(title = 'Asian Ethnicity')
+
+fig
+```

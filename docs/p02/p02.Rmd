@@ -1,0 +1,241 @@
+---
+title: "Po 2- Violin and scatter plots"
+author: "Colin Li"
+date: "1/24/2023"
+output: 
+  html_document: 
+    highlight: monochrome
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+---
+
+# Load packages and t-test results
+```{r filter}
+library(haven)
+library(dplyr)
+require(ggiraph)
+require(ggiraphExtra)
+require(plyr)
+library(ggsci)
+library(ggplot2)
+library(gridExtra)
+library(effsize)
+library(ggpubr)
+Adata <- read_sav("C:/Users/Colin/Documents/GitHub/Colin_portfolio/p02/data/AQ.sav")
+Bd <- Adata %>% 
+  filter(Asian == "1")
+
+t.test(Bd$Asian_Warmth~Bd$Conditions)
+
+t.test(Bd$White_Warmth~Bd$Conditions)
+
+
+#This study used a mixed design.
+#We measured participants positive attitudes to toward Asians and Whites before and after the condition.
+#Participants are Asian Americans. 
+#The condition is whether being rejected by Asian or White peers. 
+#I excluded people who do not identify as Asian Americans.
+#Here, I only examine the between condition attitude difference.
+#That is, compared to being rejected by Whites, do they feel have less positive attitude toward Asians when they are rejected by Asians?
+#That is, compared to being rejected by Asians, do they feel have less positive attitude toward Whites when they are rejected by Whites?
+```
+
+
+# Plots
+## Ingroup vs. outgroup prejudice on Asian Warmth
+
+Asians who are rejected by Asians feel less warm toward Asians, compared to being rejected by Whites
+
+```{r Ingroup Prejudice on Ingroup}
+ggplot(data = Bd, 
+       mapping = aes(x = Conditions, 
+                     y = Asian_Warmth, fill = Conditions)) +
+  geom_violin() +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("Asian Warmth") +
+  labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39") + ggtitle("Ingroup Prejudice Negatively Affects Ingroup Attitude")
+
+```
+
+
+### for people who prefer bar graphs
+
+
+```{r}
+ggplot(Bd, aes(x= Conditions, y = Asian_Warmth)) +
+  geom_bar(aes(fill = Conditions), stat = "summary", fun.y = "mean") + scale_y_continuous(limit = c(0, 10)) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("Asian Warmth") +
+  labs(caption = "t(180) = -2.66, 95% CI [-0.97, -0.14], Cohen's d = -0.39") + ggtitle("Ingroup Prejudice Negatively Affects Ingroup Attitude")
+
+
+
+```
+
+
+## Ingroup vs. outgroup prejudice on White Warmth
+
+Asians who are rejected by Whites feel the same toward Whites, compared to being rejected by Asians
+
+
+```{r Outgroup Prejudice on Outgroup}
+ggplot(data = Bd, 
+       mapping = aes(x = Conditions, 
+                     y = White_Warmth, fill = Conditions)) +
+  geom_violin() + stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("White Warmth") + 
+  labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05") + ggtitle("Prejudice Type Had No Effect on Outgroup Attitude")
+
+```
+
+### for people who prefer bar graphs
+
+
+```{r}
+ggplot(Bd, aes(x= Conditions, y = White_Warmth)) +
+  geom_bar(aes(fill = Conditions), stat = "summary", fun.y = "mean") + scale_y_continuous(limit = c(0, 10)) +  stat_summary(fun = "mean",
+               geom = "point", 
+               width = 0.5,
+               colour = "black") + stat_summary(fun.data = "mean_cl_normal",
+               geom = "errorbar",
+               width = .4) +
+  scale_fill_jco()+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))+
+   scale_y_continuous(limit = c(0, 10))+
+  stat_compare_means(method = "t.test", na.rm = TRUE) + xlab("Condition") + 
+  ylab("White Warmth") +
+  labs(caption = "t(179) = -.32, 95% CI [-0.61, 0.44], Cohen's d = -0.05") + ggtitle("Prejudice Type Had No Effect on Outgroup Attitude")
+```
+
+
+
+
+## Prejudice type * centrality interaction
+
+### Prejudice type * centrality interaction on Asian warmth
+
+The impact of prejudice type (ingroup vs. outgroup) on positive attitude toward Asians does not differ by centrality (i.e., how much Asians value their group membership)
+
+```{r Condition Centrality Interaction on Asian Warmth}
+
+
+ggplot(data = Bd, 
+       mapping = aes(x = Centrality, 
+                     y = Asian_Warmth, color=Conditions)) +
+  xlab("Centrality") + 
+  ylab("Asian Warmth") + 
+  geom_point() +
+  scale_color_jco()+
+  geom_smooth(method = lm)+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"),
+)+
+   scale_y_continuous(limit = c(1, 10)) + ggtitle("The Impact of Prejudice Type Does Not Differ by Centrality")
+
+
+```
+
+
+### Prejudice type * centrality interaction on White warmth
+
+
+The impact of Asian prejudice type (ingroup vs. outgroup) on positive attitude toward Whites does not differ by centrality (i.e., how much Asians value their group membership)
+
+```{r Condition Centrality Interaction on White Warmth}
+ggplot(data = Bd, 
+       mapping = aes(x = Centrality, 
+                     y = White_Warmth, color=Conditions)) +
+  xlab("Centrality") + 
+  ylab("White Warmth") +
+  geom_point() +
+  scale_color_jco()+
+  geom_smooth(method = lm)+ theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"),
+)+
+   scale_y_continuous(limit = c(1, 10)) + ggtitle("The Impact of Prejudice Type Does Not Differ by Centrality")
+
+
+```
+
+
+
+
+## Backup plots
+
+These are backup plots for the violin plots
+
+
+```{r}
+
+#library(dplyr)
+#library(magrittr)
+
+Bd1 <- Bd %>% select(Conditions, Asian_Warmth, White_Warmth)
+
+
+ggstatsplot::ggbetweenstats(
+  data = Bd1, 
+  x = Conditions, 
+  y = Asian_Warmth,
+  messages = FALSE) + scale_y_continuous(limit = c(0, 10))+ xlab("Condition") + 
+  ylab("Asian Warmth") + scale_color_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))
+
+ggstatsplot::ggbetweenstats(
+  data = Bd1, 
+  x = Conditions, 
+  y = White_Warmth,
+  messages = FALSE) + scale_y_continuous(limit = c(0, 10))+ xlab("Condition") + 
+  ylab("White Warmth") + scale_color_jco()+theme(
+  panel.background = element_rect(fill = NA),
+  panel.grid.major = element_line(colour = "grey"))
+
+```
+
+
+## fun plot
+
+I won't use this graph, but I just think it's cool
+
+
+```{r}
+
+AW=lm(Asian_Warmth~Conditions*Centrality,Bd)
+summary(AW)
+
+ggPredict(AW,colorAsFactor = TRUE,interactive=TRUE) 
+
+```

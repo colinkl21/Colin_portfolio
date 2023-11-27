@@ -1,0 +1,73 @@
+---
+title: "Country"
+output: html_document
+date: "2023-11-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(see)
+library(ggsci)
+
+# Creating a data frame with the given percentages
+df <- data.frame(
+  Level = factor(rep(c("High", "Medium", "Low"), each = 2), levels= c("High", "Medium", "Low")),
+  Category = rep(c("Gender", "Sexual Orientation"), times = 3),
+  Percentage = c(0.29, 0.86, 0.33, 0.33, 0, 0)
+)
+
+
+
+# Plotting the bar graph with facet wrap and labels using ggplot
+ggplot(df, aes(x = Level, y = Percentage, fill = Level)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), width =0.8) +
+  geom_text(aes(label = scales::percent(Percentage, accuracy = 1)),
+            position = position_dodge(width = 0.9), 
+            vjust = -0.5, size = 9) +
+  facet_wrap(~ Category, scales = "free") +
+  labs(x = "Level", y = "Percentage", fill = "Level") +
+  theme_modern() +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  theme(legend.position = "none",
+        axis.text = element_text(size = 20),
+        axis.title = element_text(size = 24, face = "bold"),
+        strip.text = element_text(size = 24),
+        strip.background = element_blank()) + scale_fill_simpsons()
+
+```
+
+
+```{r}
+
+
+# Creating a data frame with the percentages
+df <- data.frame(
+  Category = c("Gender", "Sexual Orientation"),
+  Percentage = c(0.21, 0.42)
+)
+
+ggplot(df, aes(x = Category, y = Percentage, fill = Category)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), width =0.8) +
+  geom_text(aes(label = scales::percent(Percentage, accuracy = 1)),
+            position = position_dodge(width = 0.9), 
+            vjust = -0.5, size = 9) +
+  labs(x = NULL, y = "Percentage") +
+  theme_modern() +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  theme(legend.position = "none",
+        axis.text.x = element_text(size = 24, face = "bold"),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 24, face = "bold"),
+        strip.text = element_text(size = 24),
+        strip.background = element_blank()) + scale_fill_cosmic()
+
+```
+

@@ -1,0 +1,51 @@
+---
+title: "QCV"
+author: "Colin Li"
+date: '2023-02-28'
+output: 
+  html_document: 
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+This procedure is called quantifying construct validity. Essentially we asked people to hypothesize the correlations between the definition of belonging with other variables. Then we obtain the actual correlations between our belonging scale and these variables. Then an index can be computed based on the mismatch between hypothesized correlations and actual correlations. This index represent the focal scale's convergent and discriminant validity. P.S. On the graphs, you cannot see the variable names but you can tell what the variables are in the code. 
+
+# line
+```{r}
+
+library(tidyverse)
+library(plotly)
+library(ggplot2)
+library(ggsci)
+
+qcv <- read_csv("C:/Users/Colin/Documents/newdata.csv")
+
+qcv$Variables <- recode_factor(qcv$Variables, NTB = "1", GBS = "2", IS = "3", Friend = "4", Grit = "5", Growth = "6", GSE = "7", ACSF = "8", Perf = "9", Lone = "10", HH = "11", Emo = "12", Ext = "13", Agb = "14", Con = "15", Op = "16")
+
+p <- ggplot(qcv, aes(x = Variables, y = r, group = Correlation)) + geom_line(aes(color = Correlation)) + geom_point(aes(color = Correlation)) + theme(panel.background = element_rect(fill = "white", colour = "grey50")) + scale_color_futurama() + scale_y_continuous(limits = c(-1, 1)) +xlab("Criterion Variables") + ggtitle("The Pattern of Correlations Across Criterion Variables")
+
+#qcv$Variables <- recode_factor(qcv$Variables, NTB  = "Need to Belong", GBS = "General Belongingness", ACSF = "Academic Contingency of Self-Worth", Agb = "Agreebleness", Emo = "Emotionality", Ext = "Extraversion", HH = "Honesty-Humility", Con = "Conscientiousness", Op = "Openness", Perf = "Perfectionism", Friend = "Friendship", Growth = "Growth Mindset", Lone = "Loneliness", IS = "Interpersonal Support", Grit = "Grit", GSE = "General Self-Efficacy")
+
+
+p
+
+ggplotly(p)
+
+```
+
+
+# mismatch
+```{r}
+
+o <- ggplot(qcv, aes(x = Variables, y = r, color = Correlation)) + geom_line(color="black", size = 0.5) +
+    geom_point(aes(color=Correlation, size = 0.5, alpha = 0.8)) + theme(panel.background = element_rect(fill = "white", colour = "grey50")) + scale_color_futurama() + scale_y_continuous(limits = c(-1, 1)) + ggtitle("The Mismatch Between Predicted and Actual Correlations") + guides(alpha = FALSE, size = FALSE) + xlab("Criterion Variables")
+
+o
+
+ggplotly(o)
+
+```
+
